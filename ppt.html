@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Hub - Presentasi IPPL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --accent: #06b6d4;
+            --accent-hover: #0891b2;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow: hidden; /* Mencegah scroll, karena ini slide */
+        }
+
+        /* Container Slide */
+        #presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 60px 100px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        .slide.previous { transform: translateX(-50px); }
+        .slide.next { transform: translateX(50px); }
+
+        /* Typography */
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 4.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #06b6d4, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3rem;
+            margin-bottom: 40px;
+            color: var(--text-main);
+            border-bottom: 3px solid var(--accent);
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        h3 { font-size: 1.5rem; color: var(--accent); margin-bottom: 15px; }
+        p { font-size: 1.2rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
+
+        /* Layouts */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            transition: transform 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); border-color: var(--accent); }
+        .card i { font-size: 2.5rem; color: var(--accent); margin-bottom: 20px; }
+
+        /* Architecture Flow */
+        .arch-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 20px;
+        }
+        .arch-node { text-align: center; }
+        .arch-node i { font-size: 4rem; color: var(--accent); margin-bottom: 15px; }
+        .arch-arrow { color: var(--text-muted); font-size: 2rem; }
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 15px 20px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        th { background-color: var(--bg-card); color: var(--accent); font-size: 1.2rem; }
+        td { font-size: 1.1rem; }
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; }
+        .bg-success { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        .bg-danger { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+        .bg-warning { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+
+        /* Navigation Controls */
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            right: 50px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+        .btn {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn:hover { background: var(--accent); color: var(--bg-dark); }
+        
+        /* Slide Counter */
+        #slide-counter {
+            position: fixed;
+            bottom: 40px;
+            left: 50px;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            font-weight: bold;
+            z-index: 100;
+        }
+
+        /* Abstract Background Elements */
+        .bg-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.5;
+        }
+        .shape1 { top: -100px; right: -100px; width: 400px; height: 400px; background: rgba(6, 182, 212, 0.3); }
+        .shape2 { bottom: -150px; left: -100px; width: 500px; height: 500px; background: rgba(59, 130, 246, 0.2); }
+    </style>
+</head>
+<body>
+
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+
+    <div id="slide-counter">Slide 1 / 7</div>
+
+    <div class="controls">
+        <button class="btn" onclick="prevSlide()"><i class="fa-solid fa-arrow-left"></i> Prev</button>
+        <button class="btn" onclick="nextSlide()">Next <i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+
+    <div id="presentation-container">
+        
+        <div class="slide active">
+            <h1 style="text-align: center; font-size: 6rem;">NEXUS HUB</h1>
+            <p style="text-align: center; font-size: 1.8rem; color: #fff;">Smart Utility Tools Berbasis Microservice</p>
+            <p style="text-align: center; margin-top: 30px;">
+                <span style="background: var(--bg-card); padding: 10px 20px; border-radius: 30px; display: inline-block;">
+                    <i class="fa-brands fa-react"></i> Next.js &nbsp;&nbsp;|&nbsp;&nbsp; 
+                    <i class="fa-brands fa-python"></i> Python Flask &nbsp;&nbsp;|&nbsp;&nbsp; 
+                    <i class="fa-solid fa-database"></i> Supabase
+                </span>
+            </p>
+            <div style="text-align: center; margin-top: 80px; color: var(--text-muted);">
+                <p>Presentasi Mata Kuliah Implementasi & Pengujian Perangkat Lunak</p>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>Latar Belakang Produk</h2>
+            <div class="grid-2">
+                <div>
+                    <h3 style="font-size: 2rem;"><i class="fa-solid fa-triangle-exclamation"></i> Identifikasi Masalah</h3>
+                    <p>Mahasiswa dan profesional sering membutuhkan alat pemroses dokumen (kompresi, merge, konversi). Namun, layanan yang ada seringkali:</p>
+                    <ul style="color: var(--text-muted); font-size: 1.2rem; line-height: 1.8; padding-left: 20px;">
+                        <li>Mengancam privasi (file disimpan di server tanpa persetujuan).</li>
+                        <li>Memiliki batasan ukuran file yang ketat.</li>
+                        <li>Terpisah-pisah di berbagai website berbeda.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3><i class="fa-solid fa-lightbulb"></i> Solusi: Nexus Hub</h3>
+                    <p>Sebuah platform terpusat (*Hub*) yang aman, cepat, dan didesain khusus untuk efisiensi akademis.</p>
+                    <hr style="border-color: rgba(255,255,255,0.1); margin: 20px 0;">
+                    <p><b>Nilai Jual Utama (USP):</b></p>
+                    <p><i class="fa-solid fa-check text-accent"></i> <b>Auto Garbage Collection:</b> File langsung dihapus dari memori server setelah diproses.</p>
+                    <p><i class="fa-solid fa-check text-accent"></i> <b>Data Isolation:</b> Riwayat dokumen diproteksi via Supabase Row Level Security (RLS).</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>Arsitektur Sistem (Microservice)</h2>
+            <p>Pemisahan layer Client dan Server untuk menjamin skalabilitas dan performa proses komputasi berat (manipulasi PDF).</p>
+            <div class="arch-flow" style="margin-top: 40px;">
+                <div class="arch-node">
+                    <i class="fa-brands fa-react"></i>
+                    <h3>Client-Side</h3>
+                    <p>Next.js & Tailwind<br>(Vercel)</p>
+                </div>
+                <div class="arch-arrow">
+                    <i class="fa-solid fa-arrows-left-right"></i><br>
+                    <span style="font-size: 1rem;">REST API</span>
+                </div>
+                <div class="arch-node">
+                    <i class="fa-brands fa-python"></i>
+                    <h3>Processing Engine</h3>
+                    <p>Flask & PyMuPDF<br>(PythonAnywhere)</p>
+                </div>
+                <div class="arch-arrow">
+                    <i class="fa-solid fa-arrows-left-right"></i><br>
+                    <span style="font-size: 1rem;">SQL/Storage</span>
+                </div>
+                <div class="arch-node">
+                    <i class="fa-solid fa-server"></i>
+                    <h3>BaaS</h3>
+                    <p>Supabase Auth & DB<br>(PostgreSQL)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>6 Core Tools End-to-End</h2>
+            <div class="grid-3">
+                <div class="card">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <h3>PDF Merger</h3>
+                    <p>Penggabungan array file PDF dengan urutan dinamis.</p>
+                </div>
+                <div class="card">
+                    <i class="fa-solid fa-compress"></i>
+                    <h3>PDF Compressor</h3>
+                    <p>Reduksi size via PyMuPDF tanpa merusak resolusi teks.</p>
+                </div>
+                <div class="card">
+                    <i class="fa-solid fa-file-word"></i>
+                    <h3>PDF to Word</h3>
+                    <p>Konversi tata letak menggunakan engine pdf2docx.</p>
+                </div>
+                <div class="card">
+                    <i class="fa-solid fa-align-left"></i>
+                    <h3>PDF to Text</h3>
+                    <p>Ekstraksi string mentah menjadi file .txt murni.</p>
+                </div>
+                <div class="card">
+                    <i class="fa-solid fa-images"></i>
+                    <h3>Image to PDF</h3>
+                    <p>Kompilasi gambar JPG/PNG ke dalam struktur dokumen.</p>
+                </div>
+                <div class="card" style="border-color: var(--accent);">
+                    <i class="fa-solid fa-robot"></i>
+                    <h3>Format Analyzer (Beta)</h3>
+                    <p>Pengecekan metadata & kaidah penulisan (Font, Bab).</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>Strategi Pengujian Perangkat Lunak</h2>
+            <p>Untuk memastikan reliabilitas produk, pengujian dibagi menjadi 3 lapisan (Layers of Testing):</p>
+            <div class="grid-3" style="margin-top: 30px;">
+                <div class="card">
+                    <h3>1. Unit Testing (Backend)</h3>
+                    <p>Menguji fungsi individual di Python secara terisolasi.</p>
+                    <ul style="color: var(--text-muted); margin-left: 20px;">
+                        <li>Fungsi kalkulasi ukuran file.</li>
+                        <li>Validasi MIME type file yang diunggah.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>2. Integration Testing</h3>
+                    <p>Menguji komunikasi antar microservice.</p>
+                    <ul style="color: var(--text-muted); margin-left: 20px;">
+                        <li>Koneksi Next.js ke Flask API via CORS.</li>
+                        <li>Penyisipan log aktivitas ke DB Supabase.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>3. System / E2E Testing</h3>
+                    <p>Menguji aliran (*flow*) dari sudut pandang pengguna.</p>
+                    <ul style="color: var(--text-muted); margin-left: 20px;">
+                        <li>Proses Login -> Upload File -> Proses -> Download.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2>Skenario Pengujian (Test Cases)</h2>
+            <div style="background: var(--bg-card); padding: 20px; border-radius: 10px; overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID Uji</th>
+                            <th>Modul</th>
+                            <th>Skenario Uji (Test Case)</th>
+                            <th>Hasil yang Diharapkan (Expected)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>TC-01</td>
+                            <td>Autentikasi</td>
+                            <td>Login dengan email yang belum terdaftar di Supabase.</td>
+                            <td>Sistem menolak akses dan memunculkan error "Invalid Credentials".</td>
+                            <td><span class="badge bg-success">Pass (Sesuai)</span></td>
+                        </tr>
+                        <tr>
+                            <td>TC-02</td>
+                            <td>Compressor</td>
+                            <td>Mengunggah file PDF berukuran > 15MB.</td>
+                            <td>Sistem berhasil mereduksi ukuran file dan tombol Download muncul.</td>
+                            <td><span class="badge bg-success">Pass (Sesuai)</span></td>
+                        </tr>
+                        <tr>
+                            <td>TC-03</td>
+                            <td>Format Analyzer</td>
+                            <td>Mengunggah file Gambar (.jpg) ke modul PDF Analyzer.</td>
+                            <td>Frontend menolak file (*Negative Test*) dan meminta file .pdf.</td>
+                            <td><span class="badge bg-success">Pass (Sesuai)</span></td>
+                        </tr>
+                        <tr>
+                            <td>TC-04</td>
+                            <td>Keamanan (Backend)</td>
+                            <td>Mengecek direktori Python setelah proses merge selesai.</td>
+                            <td>File mentah pengguna telah dihapus secara otomatis dari *server*.</td>
+                            <td><span class="badge bg-success">Pass (Sesuai)</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div style="text-align: center; max-width: 800px; margin: 0 auto;">
+                <i class="fa-solid fa-rocket" style="font-size: 5rem; color: var(--accent); margin-bottom: 30px;"></i>
+                <h2>Status Implementasi & Kesimpulan</h2>
+                <p style="font-size: 1.5rem; color: #fff;">Nexus Hub telah sukses di-deploy dan berjalan dengan baik.</p>
+                <div style="background: var(--bg-card); padding: 30px; border-radius: 20px; margin-top: 40px; text-align: left;">
+                    <p><i class="fa-solid fa-check-circle text-accent"></i> <b>Implementasi Frontend:</b> Live at Vercel.</p>
+                    <p><i class="fa-solid fa-check-circle text-accent"></i> <b>Implementasi Backend:</b> Live at PythonAnywhere.</p>
+                    <p><i class="fa-solid fa-check-circle text-accent"></i> <b>Pengujian:</b> Seluruh *core-features* telah lulus pengujian *Black-box* dan *Validation Testing*.</p>
+                </div>
+                <h3 style="margin-top: 40px;">Terima Kasih!</h3>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const counter = document.getElementById('slide-counter');
+
+        function updateSlides() {
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active', 'previous', 'next');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else if (index < currentSlide) {
+                    slide.classList.add('previous');
+                } else {
+                    slide.classList.add('next');
+                }
+            });
+            counter.innerText = `Slide ${currentSlide + 1} / ${slides.length}`;
+        }
+
+        function nextSlide() {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                updateSlides();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlides();
+            }
+        }
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'Space') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        // Initialize
+        updateSlides();
+    </script>
+</body>
+</html>

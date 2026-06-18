@@ -7,6 +7,7 @@ export async function POST(request: Request) {
     // 1. Tangkap data file yang dikirim dari Frontend
     const formData = await request.formData();
     const files = formData.getAll('files') as File[];
+    const userId = formData.get('userId') as string || 'anonymous'; // TANGKAP ID
 
     if (!files || files.length < 2) {
       return NextResponse.json(
@@ -56,6 +57,7 @@ export async function POST(request: Request) {
     // 7. Catat aktivitas ini ke Database Supabase (activity_logs)
     await supabase.from('activity_logs').insert([
       {
+        user_id: userId,
         session_id: 'anonymous', 
         tool_type: 'MERGE',
         input_files: fileNames,

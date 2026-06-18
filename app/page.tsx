@@ -3,213 +3,122 @@
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
-import { FileDown, FileText, Combine, History, Activity, Moon, Sun } from 'lucide-react';
+import { Activity, ArrowRight, ShieldCheck, Zap, Layers, Moon, Sun } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
-// 1. SOLUSI ERROR 'ANY': Kita definisikan tipe data Supabase dengan jelas
-interface ActivityLog {
-  id: string;
-  created_at: string;
-  tool_type: string;
-  status: string;
-  output_file_url: string | null;
-  error_details: string | null;
-}
-
-export default function Home() {
+export default function LandingPage() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  // Menggunakan tipe ActivityLog, bukan 'any'
-  const [logs, setLogs] = useState<ActivityLog[]>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    // 2. SOLUSI ERROR 'DECLARED': Kita pindahkan fungsi ini ke DALAM useEffect 
-    // agar terisolasi dengan rapi dan tidak bentrok.
-    const fetchLogs = async () => {
-      const { data } = await supabase
-        .from('activity_logs')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(5);
-        
-      if (data) setLogs(data as ActivityLog[]);
-    };
-
-    // 3. SOLUSI ERROR 'SETSTATE': Kita jalankan fetchLogs dulu, 
-    // lalu setMounted di akhir menggunakan requestAnimationFrame agar tidak bertabrakan dengan render bawaan React.
-    requestAnimationFrame(() => {
-      setMounted(true);
-    });
-    
-    fetchLogs();
-  }, []);
-  
-  return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-sans transition-colors duration-300">
+    // Cek apakah user sudah login agar tombol berubah secara dinamis
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) setIsLoggedIn(true);
       
-      {/* HEADER & NAVBAR */}
-      <header className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-10 transition-colors duration-300">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="bg-blue-600 p-2 rounded-lg">
-              <Activity className="text-white w-6 h-6" />
-            </div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Nexus Hub</h1>
+      requestAnimationFrame(() => setMounted(true));
+    };
+    checkSession();
+  }, []);
+
+  if (!mounted) return <div className="min-h-screen bg-slate-50 dark:bg-slate-900"></div>;
+
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-sans transition-colors duration-300 flex flex-col">
+      
+      {/* NAVBAR */}
+      <header className="px-6 py-4 flex justify-between items-center max-w-7xl mx-auto w-full">
+        <div className="flex items-center gap-2">
+          <div className="bg-blue-600 p-2 rounded-lg shadow-sm">
+            <Activity className="text-white w-6 h-6" />
           </div>
+          <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Nexus Hub</h1>
+        </div>
+        
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="p-2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors"
+          >
+            {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
           
-          <nav className="flex items-center gap-4">
-            <p className="text-sm text-slate-500 dark:text-slate-400 hidden sm:block">Proyek IPPL &copy; 2026</p>
-            
-            {/* TOMBOL DARK MODE */}
-            {mounted && (
-              <button
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="p-2 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
-                title="Ganti Tema"
-              >
-                {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-              </button>
-            )}
-          </nav>
+          <Link 
+            href={isLoggedIn ? "/dashboard" : "/login"} 
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-full transition-colors shadow-md"
+          >
+            {isLoggedIn ? "Masuk Dashboard" : "Login"}
+          </Link>
         </div>
       </header>
 
-      {/* MAIN CONTENT */}
-      <main className="max-w-6xl mx-auto px-4 py-12">
-        <div className="mb-12 text-center">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white mb-4">
-            Smart Utility Tools untuk Segala Kebutuhan
+      {/* HERO SECTION */}
+      <main className="flex-grow flex flex-col justify-center items-center px-4 text-center">
+        <div className="max-w-4xl mx-auto py-20">
+          <div className="inline-block mb-6 px-4 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-semibold border border-blue-200 dark:border-blue-800">
+            ✨ Proyek Implementasi & Pengujian Perangkat Lunak
+          </div>
+          <h2 className="text-5xl md:text-6xl font-extrabold text-slate-900 dark:text-white leading-tight mb-6">
+            Kelola Dokumen PDF Anda <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-emerald-500">
+              Lebih Cepat & Pintar
+            </span>
           </h2>
-          <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-lg">
-            Pilih alat yang Anda butuhkan. Pemrosesan dilakukan dengan cepat, aman, dan tanpa perlu mendaftar.
+          <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+            Satu platform tangguh untuk menggabungkan, mengompresi, mengekstrak, dan mengubah format dokumen Anda tanpa iklan dan tanpa mengorbankan privasi.
           </p>
-        </div>
-
-        {/* TOOLS GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          <Link href="/merge" className="group">
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-300 h-full flex flex-col">
-              <div className="bg-blue-50 dark:bg-slate-700 w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors">
-                <Combine className="w-7 h-7 text-blue-600 dark:text-blue-400 group-hover:text-white" />
-              </div>
-              <h3 className="text-xl font-bold mb-2 dark:text-white">PDF Merger</h3>
-              <p className="text-slate-500 dark:text-slate-400 flex-grow">
-                Gabungkan dua atau lebih file PDF menjadi satu dokumen utuh dengan urutan yang bisa Anda atur.
-              </p>
-            </div>
-          </Link>
-
-          <Link href="/compress" className="group">
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl hover:emerald-300 dark:hover:border-emerald-500 transition-all duration-300 h-full flex flex-col">
-              <div className="bg-emerald-50 dark:bg-slate-700 w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:bg-emerald-500 transition-colors">
-                <FileDown className="w-7 h-7 text-emerald-600 dark:text-emerald-400 group-hover:text-white" />
-              </div>
-              <h3 className="text-xl font-bold mb-2 dark:text-white">PDF Compressor</h3>
-              <p className="text-slate-500 dark:text-slate-400 flex-grow">
-                Perkecil ukuran file PDF Anda agar lebih ringan saat diunggah tanpa mengurangi kualitas teks.
-              </p>
-            </div>
-          </Link>
-
-          <Link href="/to-text" className="group">
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl hover:purple-300 dark:hover:border-purple-500 transition-all duration-300 h-full flex flex-col">
-              <div className="bg-purple-50 dark:bg-slate-700 w-14 h-14 rounded-xl flex items-center justify-center mb-6 group-hover:bg-purple-600 transition-colors">
-                <FileText className="w-7 h-7 text-purple-600 dark:text-purple-400 group-hover:text-white" />
-              </div>
-              <h3 className="text-xl font-bold mb-2 dark:text-white">PDF to Text</h3>
-              <p className="text-slate-500 dark:text-slate-400 flex-grow">
-                Ekstrak seluruh teks dari dokumen PDF Anda secara instan dan simpan sebagai file teks murni.
-              </p>
-            </div>
-          </Link>
-        </div>
-
-        {/* ACTIVITY HISTORY */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden mb-16">
-          <div className="bg-slate-50 dark:bg-slate-800/50 px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center gap-2">
-            <History className="w-5 h-5 text-slate-500 dark:text-slate-400" />
-            <h3 className="font-bold text-slate-700 dark:text-slate-200">Riwayat Aktivitas Publik</h3>
-          </div>
-          <div className="p-0 overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-600 dark:text-slate-300">
-              <thead className="bg-slate-50/50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
-                <tr>
-                  <th className="px-6 py-3 font-medium">Waktu</th>
-                  <th className="px-6 py-3 font-medium">Jenis Alat</th>
-                  <th className="px-6 py-3 font-medium">Status</th>
-                  <th className="px-6 py-3 font-medium">Aksi</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
-                {logs.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="px-6 py-8 text-center text-slate-500 dark:text-slate-400">
-                      Mengambil data riwayat...
-                    </td>
-                  </tr>
-                )}
-                {logs.map((log) => (
-                  <tr key={log.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors">
-                    <td className="px-6 py-4">
-                      {new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
-                    </td>
-                    <td className="px-6 py-4 font-medium text-slate-700 dark:text-slate-200">
-                      {log.tool_type === 'MERGE' ? 'PDF Merger' : log.tool_type === 'COMPRESS' ? 'PDF Compressor' : 'PDF to Text'}
-                    </td>
-                    <td className="px-6 py-4">
-                      {log.status === 'SUCCESS' ? (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-400">Success</span>
-                      ) : (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400">Failed</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      {log.status === 'SUCCESS' && log.output_file_url ? (
-                        <a href={log.output_file_url} target="_blank" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">Download</a>
-                      ) : (
-                        <span className="text-slate-400 dark:text-slate-500">{log.error_details || '-'}</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+            <Link 
+              href={isLoggedIn ? "/dashboard" : "/login"} 
+              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-full transition-all shadow-lg hover:shadow-blue-500/30 flex items-center justify-center gap-2 text-lg"
+            >
+              {isLoggedIn ? "Buka Dashboard Saya" : "Mulai Gunakan Gratis"}
+              <ArrowRight className="w-5 h-5" />
+            </Link>
           </div>
         </div>
 
-        {/* GLOBAL HEALTH STATUS FOOTER */}
-        <div className="border-t border-slate-200 dark:border-slate-800 pt-8 pb-4">
-          <div className="flex flex-wrap justify-center gap-6 text-xs font-medium text-slate-500 dark:text-slate-400">
-            {/* Indikator 1: Next.js */}
-            <div className="flex items-center gap-2 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-              </span>
-              Next.js Server: Online
+        {/* FEATURES SECTION */}
+        <div className="w-full max-w-6xl mx-auto py-16 grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+          <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-emerald-100 dark:bg-emerald-900/30 w-14 h-14 rounded-2xl flex items-center justify-center mb-6">
+              <Zap className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
             </div>
-            
-            {/* Indikator 2: Supabase */}
-            <div className="flex items-center gap-2 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-              </span>
-              Supabase Connection: Connected
-            </div>
+            <h3 className="text-xl font-bold mb-3 dark:text-white">Eksekusi Sekejap</h3>
+            <p className="text-slate-500 dark:text-slate-400 leading-relaxed">
+              Didukung oleh mesin backend Python Microservice khusus untuk memastikan manipulasi file berat diproses tanpa hambatan.
+            </p>
+          </div>
 
-            {/* Indikator 3: Python */}
-            <div className="flex items-center gap-2 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-              </span>
-              Python Engine: Active
+          <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-blue-100 dark:bg-blue-900/30 w-14 h-14 rounded-2xl flex items-center justify-center mb-6">
+              <ShieldCheck className="w-7 h-7 text-blue-600 dark:text-blue-400" />
             </div>
+            <h3 className="text-xl font-bold mb-3 dark:text-white">Privasi Terjamin</h3>
+            <p className="text-slate-500 dark:text-slate-400 leading-relaxed">
+              File Anda akan otomatis dibersihkan dari server (*Garbage Collection*) seketika setelah proses pengunduhan selesai.
+            </p>
+          </div>
+
+          <div className="bg-white dark:bg-slate-800 p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
+            <div className="bg-purple-100 dark:bg-purple-900/30 w-14 h-14 rounded-2xl flex items-center justify-center mb-6">
+              <Layers className="w-7 h-7 text-purple-600 dark:text-purple-400" />
+            </div>
+            <h3 className="text-xl font-bold mb-3 dark:text-white">5 Alat Terintegrasi</h3>
+            <p className="text-slate-500 dark:text-slate-400 leading-relaxed">
+              Mulai dari penggabung PDF, ekstraksi gambar, konversi ke Word, hingga reduksi ukuran file tersedia di satu tempat.
+            </p>
           </div>
         </div>
-
       </main>
+
+      {/* FOOTER */}
+      <footer className="border-t border-slate-200 dark:border-slate-800 py-8 text-center text-slate-500 dark:text-slate-400 text-sm">
+        <p>&copy; {new Date().getFullYear()} Nexus Hub. Didesain dengan standar Enterprise untuk mata kuliah IPPL.</p>
+      </footer>
+
     </div>
   );
 }

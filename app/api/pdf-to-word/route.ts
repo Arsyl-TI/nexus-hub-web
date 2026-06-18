@@ -8,37 +8,34 @@ export async function POST(request: Request) {
     const userId = formData.get('userId') as string || 'anonymous'; // TANGKAP ID
 
     if (!file) {
-      return NextResponse.json({ error: 'Tidak ada file yang diunggah.' }, { status: 400 });
+      return NextResponse.json({ error: 'Tidak ada file dokumen.' }, { status: 400 });
     }
 
-    // MEMBUNGKUS ULANG FILE SEBELUM DIKIRIM KE PYTHON
-    // Ini mencegah error boundary pada fetch bawaan Node.js
     const pythonFormData = new FormData();
     pythonFormData.append('file', file);
 
-    // Tambahkan baris ini untuk memanggil URL dari .env
     const pythonServer = process.env.NEXT_PUBLIC_PYTHON_SERVER || 'http://localhost:5001';
-
-    const pythonResponse = await fetch(`${pythonServer}/api/extract-text`, {
+    
+    // Kirim data ke Python server
+    const pythonResponse = await fetch(`${pythonServer}/api/pdf-to-word`, {
       method: 'POST',
-      body: pythonFormData, 
+      body: pythonFormData,
     });
 
-    const pythonData = await pythonResponse.json();
-
     if (!pythonResponse.ok) {
-        throw new Error(pythonData.error || 'Server pemroses teks gagal.');
+        throw new Error('Gagal mengonversi struktur PDF ke Word.');
     }
 
-    const extractedText = pythonData.text;
-    const txtBuffer = Buffer.from(extractedText, 'utf-8');
-    const uniqueFilename = `extracted_${Date.now()}_${Math.floor(Math.random() * 1000)}.txt`;
+    // Ambil data buffer dokumen .docx
+    const docxBuffer = await pythonResponse.arrayBuffer();
+    const uniqueFilename = `docx_${Date.now()}_${Math.floor(Math.random() * 1000)}.docx`;
 
+    // Unggah file Word ke Supabase Bucket
     const { error: storageError } = await supabase
       .storage
       .from('pdf-results')
-      .upload(uniqueFilename, txtBuffer, {
-        contentType: 'text/plain',
+      .upload(uniqueFilename, docxBuffer, {
+        contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       });
 
     if (storageError) throw new Error(storageError.message);
@@ -46,10 +43,11 @@ export async function POST(request: Request) {
     const { data: publicUrlData } = supabase.storage.from('pdf-results').getPublicUrl(uniqueFilename);
     const downloadUrl = publicUrlData.publicUrl;
 
+    // Catat log kesuksesan di PostgreSQL
     await supabase.from('activity_logs').insert([{
         user_id: userId,
         session_id: 'anonymous',
-        tool_type: 'TO_TEXT',
+        tool_type: 'PDF_TO_WORD',
         input_files: [file.name],
         output_file_url: downloadUrl,
         status: 'SUCCESS',
@@ -60,19 +58,6 @@ export async function POST(request: Request) {
 
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan sistem';
-    
-    // MUNCULKAN ERROR DI TERMINAL AGAR MUDAH DILACAK
-    console.error("🚨 LOG ERROR TERMINAL:", errorMessage);
-    
-    await supabase.from('activity_logs').insert([{
-        session_id: 'anonymous',
-        tool_type: 'TO_TEXT',
-        input_files: [],
-        output_file_url: null,
-        status: 'FAILED',
-        error_details: errorMessage
-    }]);
-
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
