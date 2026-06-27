@@ -17,6 +17,8 @@ interface FormatResults {
   cover_check: CheckResult;
   page_number_check: CheckResult;
   abstract_check: CheckResult;
+  margin_check: CheckResult;
+  spacing_check: CheckResult;
 }
 
 const ResultCard = ({ title, result }: { title: string, result: CheckResult }) => (
@@ -148,6 +150,8 @@ export default function CheckFormatPage() {
                   <ResultCard title="Batas Abstrak (Maks 500 Kata)" result={results.abstract_check} />
                   <ResultCard title="Daftar Isi Otomatis" result={results.toc_check} />
                   <ResultCard title="Format Sampul (Judul 14pt)" result={results.cover_check} />
+                  <ResultCard title="Batas Margin (Kiri 4cm, Lainnya 3cm)" result={results.margin_check} />
+                  <ResultCard title="Spasi Baris (Wajib 2 Spasi)" result={results.spacing_check} />
                 </div>
 
                 {/* --- KOMPONEN BARU: PREVIEW PDF BERCORAT MERAH --- */}
@@ -181,6 +185,9 @@ export default function CheckFormatPage() {
                 <li className="flex gap-3"><div className="w-1.5 h-1.5 rounded-full bg-teal-500 mt-2 flex-shrink-0"></div><p><strong>Sampul:</strong> Memastikan judul besar berukuran 14pt dan nama Anda 12pt.</p></li>
                 <li className="flex gap-3"><div className="w-1.5 h-1.5 rounded-full bg-teal-500 mt-2 flex-shrink-0"></div><p><strong>Penomoran:</strong> Memindai area bawah halaman untuk transisi angka i, ii ke 1, 2.</p></li>
                 <li className="flex gap-3"><div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-2 flex-shrink-0"></div><p><strong>Deteksi Visual:</strong> Sistem akan menggarisi teks dengan <strong>kotak merah</strong> jika menemukan jenis font/ukuran yang menyimpang!</p></li>
+                <li className="flex gap-3"><div className="w-1.5 h-1.5 rounded-full bg-teal-500 mt-2 flex-shrink-0"></div><p><strong>Deteksi Margin & Spasi:</strong> AI menghitung ruang matematika antar huruf.</p></li>
+                <li className="flex gap-3"><div className="w-1.5 h-1.5 rounded-full bg-red-500 mt-2 flex-shrink-0"></div><p><strong>Kotak Merah:</strong> Pelanggaran pada jenis Font, Ukuran, dan Margin Kertas.</p></li>
+                <li className="flex gap-3"><div className="w-1.5 h-1.5 rounded-full bg-orange-500 mt-2 flex-shrink-0"></div><p><strong>Kotak Oranye:</strong> Pelanggaran pada Spasi Paragraf (Bukan 2 Spasi).</p></li>
               </ul>
             </div>
           </div>

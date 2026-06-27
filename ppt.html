@@ -3,377 +3,341 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Hub - Presentasi IPPL</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <title>Presentasi Nexus Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
         :root {
             --bg-dark: #0f172a;
-            --bg-card: #1e293b;
-            --accent: #06b6d4;
-            --accent-hover: #0891b2;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --text-light: #f8fafc;
+            --text-gray: #94a3b8;
+            --primary: #10b981; /* Emerald */
+            --primary-glow: rgba(16, 185, 129, 0.15);
+            --card-bg: rgba(30, 41, 59, 0.6);
+            --red-alert: #ef4444;
+            --orange-alert: #f97316;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            overflow: hidden; /* Mencegah scroll, karena ini slide */
+            font-family: 'Inter', sans-serif;
+            background-color: #000;
+            color: var(--text-light);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
         }
 
-        /* Container Slide */
-        #presentation-container {
-            width: 100vw;
-            height: 100vh;
+        .deck-container {
+            width: 1280px;
+            height: 720px;
+            background-color: var(--bg-dark);
             position: relative;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+            background-image: 
+                radial-gradient(circle at 80% 20%, var(--primary-glow) 0%, transparent 40%),
+                radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 40%);
         }
 
         .slide {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            padding: 60px 100px;
+            top: 0; left: 0; width: 100%; height: 100%;
+            padding: 60px 80px;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.5s ease-in-out;
+            transition: opacity 0.5s ease;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
 
-        .slide.active {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(0);
+        .slide.active { opacity: 1; visibility: visible; }
+
+        h1, h2, h3 { font-family: 'Poppins', sans-serif; }
+        
+        h1 { font-size: 64px; line-height: 1.2; margin-bottom: 20px; color: #fff; }
+        h1 span { color: var(--primary); }
+        
+        h2.title {
+            font-size: 40px; margin-bottom: 40px;
+            border-left: 6px solid var(--primary);
+            padding-left: 20px; text-transform: uppercase;
+            letter-spacing: 2px; position: absolute;
+            top: 60px; left: 80px;
         }
 
-        .slide.previous { transform: translateX(-50px); }
-        .slide.next { transform: translateX(50px); }
+        .content { margin-top: 80px; width: 100%; }
+        p { font-size: 22px; line-height: 1.6; color: var(--text-gray); margin-bottom: 20px; }
 
-        /* Typography */
-        h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 4.5rem;
-            margin-bottom: 20px;
-            background: linear-gradient(to right, #06b6d4, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        h2 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 3rem;
-            margin-bottom: 40px;
-            color: var(--text-main);
-            border-bottom: 3px solid var(--accent);
-            display: inline-block;
-            padding-bottom: 10px;
-        }
-
-        h3 { font-size: 1.5rem; color: var(--accent); margin-bottom: 15px; }
-        p { font-size: 1.2rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; }
-
-        /* Layouts */
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
 
-        /* Cards */
         .card {
-            background: var(--bg-card);
-            padding: 30px;
-            border-radius: 16px;
-            border: 1px solid rgba(6, 182, 212, 0.2);
-            transition: transform 0.3s;
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px; padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
-        .card:hover { transform: translateY(-5px); border-color: var(--accent); }
-        .card i { font-size: 2.5rem; color: var(--accent); margin-bottom: 20px; }
+        .card h3 { font-size: 24px; color: #fff; margin-bottom: 15px; display: flex; align-items: center; gap: 15px;}
+        .card h3 i { color: var(--primary); font-size: 28px; }
 
-        /* Architecture Flow */
-        .arch-flow {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-card);
-            padding: 40px;
-            border-radius: 20px;
-        }
-        .arch-node { text-align: center; }
-        .arch-node i { font-size: 4rem; color: var(--accent); margin-bottom: 15px; }
-        .arch-arrow { color: var(--text-muted); font-size: 2rem; }
+        ul { list-style: none; }
+        li { font-size: 22px; margin-bottom: 20px; display: flex; gap: 15px; align-items: flex-start; }
+        li i.fa-xmark { color: var(--red-alert); margin-top: 5px; font-size: 24px;}
+        li i.fa-check { color: var(--primary); margin-top: 5px; font-size: 24px;}
+        li i.fa-arrow-right { color: var(--primary); margin-top: 5px; }
+        li i.fa-circle-question { color: #facc15; margin-top: 5px; font-size: 24px;}
 
-        /* Table */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 15px 20px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        th { background-color: var(--bg-card); color: var(--accent); font-size: 1.2rem; }
-        td { font-size: 1.1rem; }
-        .badge { padding: 5px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; }
-        .bg-success { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
-        .bg-danger { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-        .bg-warning { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-
-        /* Navigation Controls */
-        .controls {
-            position: fixed;
-            bottom: 30px;
-            right: 50px;
-            display: flex;
-            gap: 15px;
-            z-index: 100;
+        /* CSS ERD DIAGRAM */
+        .erd-container {
+            display: flex; justify-content: center; align-items: center; gap: 80px;
+            margin-top: 40px; position: relative;
         }
-        .btn {
-            background: transparent;
-            border: 2px solid var(--accent);
-            color: var(--accent);
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
-            transition: all 0.3s;
+        .erd-table {
+            background: #1e293b; border: 2px solid #334155; border-radius: 12px;
+            width: 350px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            position: relative; z-index: 2;
         }
-        .btn:hover { background: var(--accent); color: var(--bg-dark); }
+        .erd-header {
+            background: var(--primary); color: #000; padding: 15px;
+            font-family: 'Poppins', sans-serif; font-weight: 700; text-align: center; font-size: 20px;
+        }
+        .erd-row {
+            display: flex; justify-content: space-between; padding: 12px 20px;
+            border-bottom: 1px solid #334155; font-size: 16px; font-family: monospace;
+        }
+        .erd-row:last-child { border-bottom: none; }
+        .erd-row .key { color: var(--primary); font-weight: bold; }
         
-        /* Slide Counter */
-        #slide-counter {
-            position: fixed;
-            bottom: 40px;
-            left: 50px;
-            color: var(--text-muted);
-            font-size: 1.2rem;
-            font-weight: bold;
-            z-index: 100;
+        /* Relasi Garis ERD */
+        .erd-line {
+            position: absolute; width: 80px; height: 4px; background: var(--primary);
+            top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1;
+        }
+        .erd-label {
+            position: absolute; top: -30px; left: 50%; transform: translateX(-50%);
+            background: var(--bg-dark); padding: 5px 15px; border-radius: 20px;
+            color: var(--primary); font-weight: 700; border: 1px solid var(--primary);
+        }
+        .erd-cardinality-1 { position: absolute; left: -20px; top: -30px; color: #fff; font-weight: bold; font-size: 20px; }
+        .erd-cardinality-n { position: absolute; right: -25px; top: -30px; color: #fff; font-weight: bold; font-size: 20px; }
+
+        .img-box {
+            width: 100%; height: 400px;
+            border: 2px dashed rgba(255,255,255,0.3); border-radius: 16px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.3); color: var(--text-gray); text-align: center; padding: 20px;
         }
 
-        /* Abstract Background Elements */
-        .bg-shape {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px);
-            z-index: -1;
-            opacity: 0.5;
+        .nav-controls {
+            position: absolute; bottom: 30px; right: 40px;
+            display: flex; gap: 20px; align-items: center; z-index: 100;
         }
-        .shape1 { top: -100px; right: -100px; width: 400px; height: 400px; background: rgba(6, 182, 212, 0.3); }
-        .shape2 { bottom: -150px; left: -100px; width: 500px; height: 500px; background: rgba(59, 130, 246, 0.2); }
+        .nav-btn {
+            background: rgba(255,255,255,0.1); border: none; color: #fff;
+            width: 50px; height: 50px; border-radius: 50%;
+            cursor: pointer; font-size: 20px; transition: 0.3s;
+        }
+        .nav-btn:hover { background: var(--primary); }
+        .slide-number { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 600; color: var(--text-gray); }
+
+        .param-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .param-item { background: rgba(16, 185, 129, 0.1); border-left: 4px solid var(--primary); padding: 15px 20px; font-size: 20px; font-weight: 500;}
     </style>
 </head>
 <body>
 
-    <div class="bg-shape shape1"></div>
-    <div class="bg-shape shape2"></div>
-
-    <div id="slide-counter">Slide 1 / 7</div>
-
-    <div class="controls">
-        <button class="btn" onclick="prevSlide()"><i class="fa-solid fa-arrow-left"></i> Prev</button>
-        <button class="btn" onclick="nextSlide()">Next <i class="fa-solid fa-arrow-right"></i></button>
-    </div>
-
-    <div id="presentation-container">
+    <div class="deck-container">
         
         <div class="slide active">
-            <h1 style="text-align: center; font-size: 6rem;">NEXUS HUB</h1>
-            <p style="text-align: center; font-size: 1.8rem; color: #fff;">Smart Utility Tools Berbasis Microservice</p>
-            <p style="text-align: center; margin-top: 30px;">
-                <span style="background: var(--bg-card); padding: 10px 20px; border-radius: 30px; display: inline-block;">
-                    <i class="fa-brands fa-react"></i> Next.js &nbsp;&nbsp;|&nbsp;&nbsp; 
-                    <i class="fa-brands fa-python"></i> Python Flask &nbsp;&nbsp;|&nbsp;&nbsp; 
-                    <i class="fa-solid fa-database"></i> Supabase
-                </span>
-            </p>
-            <div style="text-align: center; margin-top: 80px; color: var(--text-muted);">
-                <p>Presentasi Mata Kuliah Implementasi & Pengujian Perangkat Lunak</p>
+            <div style="text-align: center; width: 100%;">
+                <div style="display: inline-block; padding: 10px 25px; border: 1px solid var(--primary); border-radius: 50px; color: var(--primary); font-weight: 600; letter-spacing: 2px; margin-bottom: 30px; font-size: 16px;">
+                    UNIVERSITAS ISLAM RIAU
+                </div>
+                <h1>NEXUS HUB<br><span style="font-size: 48px; color: #cbd5e1;">Platform Utilitas Dokumen Terintegrasi</span></h1>
+                <p style="max-width: 900px; margin: 20px auto 40px; font-size: 24px;">Arsitektur Microservices untuk Pemrosesan Dokumen Akademik Cerdas dengan Fokus pada Keamanan Data (Data Isolation).</p>
+                <div style="color: var(--primary); font-size: 24px; font-weight: 700; margin-bottom: 50px;">
+                    NAMA ANDA | NPM ANDA
+                </div>
+                <div style="color: var(--text-gray); font-size: 20px; font-weight: 500; display: flex; justify-content: center; gap: 40px;">
+                    <span><i class="fa-brands fa-react"></i> Next.js</span>
+                    <span><i class="fa-brands fa-python"></i> Python Flask</span>
+                    <span><i class="fa-solid fa-database"></i> Supabase</span>
+                </div>
             </div>
         </div>
 
         <div class="slide">
-            <h2>Latar Belakang Produk</h2>
-            <div class="grid-2">
+            <h2 class="title">Latar Belakang</h2>
+            <div class="content grid-2">
                 <div>
-                    <h3 style="font-size: 2rem;"><i class="fa-solid fa-triangle-exclamation"></i> Identifikasi Masalah</h3>
-                    <p>Mahasiswa dan profesional sering membutuhkan alat pemroses dokumen (kompresi, merge, konversi). Namun, layanan yang ada seringkali:</p>
-                    <ul style="color: var(--text-muted); font-size: 1.2rem; line-height: 1.8; padding-left: 20px;">
-                        <li>Mengancam privasi (file disimpan di server tanpa persetujuan).</li>
-                        <li>Memiliki batasan ukuran file yang ketat.</li>
-                        <li>Terpisah-pisah di berbagai website berbeda.</li>
+                    <h3 style="margin-bottom: 25px; color: #fff; font-size: 28px;">Masalah di Lapangan</h3>
+                    <ul>
+                        <li><i class="fa-solid fa-xmark"></i> <div><strong>Fragmentasi Tools:</strong> Mahasiswa harus membuka web berbeda (seperti iLovePDF) untuk menggabung, mengompres, atau mengubah format dokumen.</div></li>
+                        <li><i class="fa-solid fa-xmark"></i> <div><strong>Risiko Kebocoran Data:</strong> Mengunggah dokumen Tugas Akhir (Hak Kekayaan Intelektual) ke server gratisan pihak ketiga sangat berisiko.</div></li>
+                        <li><i class="fa-solid fa-xmark"></i> <div><strong>Kesalahan Format:</strong> Skripsi sering ditolak dosen karena hal sepele seperti salah spasi, batas margin, atau font yang luput dari mata.</div></li>
                     </ul>
                 </div>
-                <div class="card">
-                    <h3><i class="fa-solid fa-lightbulb"></i> Solusi: Nexus Hub</h3>
-                    <p>Sebuah platform terpusat (*Hub*) yang aman, cepat, dan didesain khusus untuk efisiensi akademis.</p>
-                    <hr style="border-color: rgba(255,255,255,0.1); margin: 20px 0;">
-                    <p><b>Nilai Jual Utama (USP):</b></p>
-                    <p><i class="fa-solid fa-check text-accent"></i> <b>Auto Garbage Collection:</b> File langsung dihapus dari memori server setelah diproses.</p>
-                    <p><i class="fa-solid fa-check text-accent"></i> <b>Data Isolation:</b> Riwayat dokumen diproteksi via Supabase Row Level Security (RLS).</p>
+                <div class="img-box" style="background: transparent; border-color: rgba(239, 68, 68, 0.4);">
+                    <i class="fa-solid fa-triangle-exclamation" style="font-size: 80px; color: var(--red-alert); margin-bottom: 20px;"></i>
+                    <p style="font-weight: 600;">Proses pengolahan dokumen mahasiswa saat ini sangat tidak efisien, berisiko, dan rawan kesalahan teknis (Human Error).</p>
                 </div>
             </div>
         </div>
 
         <div class="slide">
-            <h2>Arsitektur Sistem (Microservice)</h2>
-            <p>Pemisahan layer Client dan Server untuk menjamin skalabilitas dan performa proses komputasi berat (manipulasi PDF).</p>
-            <div class="arch-flow" style="margin-top: 40px;">
-                <div class="arch-node">
-                    <i class="fa-brands fa-react"></i>
-                    <h3>Client-Side</h3>
-                    <p>Next.js & Tailwind<br>(Vercel)</p>
-                </div>
-                <div class="arch-arrow">
-                    <i class="fa-solid fa-arrows-left-right"></i><br>
-                    <span style="font-size: 1rem;">REST API</span>
-                </div>
-                <div class="arch-node">
-                    <i class="fa-brands fa-python"></i>
-                    <h3>Processing Engine</h3>
-                    <p>Flask & PyMuPDF<br>(PythonAnywhere)</p>
-                </div>
-                <div class="arch-arrow">
-                    <i class="fa-solid fa-arrows-left-right"></i><br>
-                    <span style="font-size: 1rem;">SQL/Storage</span>
-                </div>
-                <div class="arch-node">
-                    <i class="fa-solid fa-server"></i>
-                    <h3>BaaS</h3>
-                    <p>Supabase Auth & DB<br>(PostgreSQL)</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="slide">
-            <h2>6 Core Tools End-to-End</h2>
-            <div class="grid-3">
-                <div class="card">
-                    <i class="fa-solid fa-layer-group"></i>
-                    <h3>PDF Merger</h3>
-                    <p>Penggabungan array file PDF dengan urutan dinamis.</p>
-                </div>
-                <div class="card">
-                    <i class="fa-solid fa-compress"></i>
-                    <h3>PDF Compressor</h3>
-                    <p>Reduksi size via PyMuPDF tanpa merusak resolusi teks.</p>
-                </div>
-                <div class="card">
-                    <i class="fa-solid fa-file-word"></i>
-                    <h3>PDF to Word</h3>
-                    <p>Konversi tata letak menggunakan engine pdf2docx.</p>
-                </div>
-                <div class="card">
-                    <i class="fa-solid fa-align-left"></i>
-                    <h3>PDF to Text</h3>
-                    <p>Ekstraksi string mentah menjadi file .txt murni.</p>
-                </div>
-                <div class="card">
-                    <i class="fa-solid fa-images"></i>
-                    <h3>Image to PDF</h3>
-                    <p>Kompilasi gambar JPG/PNG ke dalam struktur dokumen.</p>
-                </div>
-                <div class="card" style="border-color: var(--accent);">
-                    <i class="fa-solid fa-robot"></i>
-                    <h3>Format Analyzer (Beta)</h3>
-                    <p>Pengecekan metadata & kaidah penulisan (Font, Bab).</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="slide">
-            <h2>Strategi Pengujian Perangkat Lunak</h2>
-            <p>Untuk memastikan reliabilitas produk, pengujian dibagi menjadi 3 lapisan (Layers of Testing):</p>
-            <div class="grid-3" style="margin-top: 30px;">
-                <div class="card">
-                    <h3>1. Unit Testing (Backend)</h3>
-                    <p>Menguji fungsi individual di Python secara terisolasi.</p>
-                    <ul style="color: var(--text-muted); margin-left: 20px;">
-                        <li>Fungsi kalkulasi ukuran file.</li>
-                        <li>Validasi MIME type file yang diunggah.</li>
-                    </ul>
-                </div>
-                <div class="card">
-                    <h3>2. Integration Testing</h3>
-                    <p>Menguji komunikasi antar microservice.</p>
-                    <ul style="color: var(--text-muted); margin-left: 20px;">
-                        <li>Koneksi Next.js ke Flask API via CORS.</li>
-                        <li>Penyisipan log aktivitas ke DB Supabase.</li>
-                    </ul>
-                </div>
-                <div class="card">
-                    <h3>3. System / E2E Testing</h3>
-                    <p>Menguji aliran (*flow*) dari sudut pandang pengguna.</p>
-                    <ul style="color: var(--text-muted); margin-left: 20px;">
-                        <li>Proses Login -> Upload File -> Proses -> Download.</li>
+            <h2 class="title">Rumusan Masalah</h2>
+            <div class="content">
+                <div class="card" style="background: rgba(30, 41, 59, 0.4);">
+                    <ul>
+                        <li><i class="fa-solid fa-circle-question"></i> <div>Bagaimana merancang sebuah platform terpusat yang dapat melakukan manipulasi PDF (Merge, Compress, Ekstrak) dalam satu antarmuka?</div></li>
+                        <li style="margin-top: 30px;"><i class="fa-solid fa-circle-question"></i> <div>Bagaimana mengimplementasikan teknologi <strong>AI Spasial</strong> untuk memvalidasi margin dan tata letak secara otomatis berdasarkan Pedoman Tugas Akhir UIR?</div></li>
+                        <li style="margin-top: 30px;"><i class="fa-solid fa-circle-question"></i> <div>Bagaimana merancang arsitektur basis data dan sesi untuk mengisolasi riwayat file agar privasi setiap mahasiswa terjamin mutlak?</div></li>
                     </ul>
                 </div>
             </div>
         </div>
 
         <div class="slide">
-            <h2>Skenario Pengujian (Test Cases)</h2>
-            <div style="background: var(--bg-card); padding: 20px; border-radius: 10px; overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID Uji</th>
-                            <th>Modul</th>
-                            <th>Skenario Uji (Test Case)</th>
-                            <th>Hasil yang Diharapkan (Expected)</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>TC-01</td>
-                            <td>Autentikasi</td>
-                            <td>Login dengan email yang belum terdaftar di Supabase.</td>
-                            <td>Sistem menolak akses dan memunculkan error "Invalid Credentials".</td>
-                            <td><span class="badge bg-success">Pass (Sesuai)</span></td>
-                        </tr>
-                        <tr>
-                            <td>TC-02</td>
-                            <td>Compressor</td>
-                            <td>Mengunggah file PDF berukuran > 15MB.</td>
-                            <td>Sistem berhasil mereduksi ukuran file dan tombol Download muncul.</td>
-                            <td><span class="badge bg-success">Pass (Sesuai)</span></td>
-                        </tr>
-                        <tr>
-                            <td>TC-03</td>
-                            <td>Format Analyzer</td>
-                            <td>Mengunggah file Gambar (.jpg) ke modul PDF Analyzer.</td>
-                            <td>Frontend menolak file (*Negative Test*) dan meminta file .pdf.</td>
-                            <td><span class="badge bg-success">Pass (Sesuai)</span></td>
-                        </tr>
-                        <tr>
-                            <td>TC-04</td>
-                            <td>Keamanan (Backend)</td>
-                            <td>Mengecek direktori Python setelah proses merge selesai.</td>
-                            <td>File mentah pengguna telah dihapus secara otomatis dari *server*.</td>
-                            <td><span class="badge bg-success">Pass (Sesuai)</span></td>
-                        </tr>
-                    </tbody>
-                </table>
+            <h2 class="title">Solusi & Fitur Utama</h2>
+            <div class="content grid-3">
+                <div class="card">
+                    <h3><i class="fa-solid fa-compress"></i> Manipulasi PDF</h3>
+                    <p style="font-size: 18px;"><strong>PDF Merger</strong> untuk menggabungkan file, dan <strong>Compressor</strong> untuk mengecilkan ukuran tanpa merusak kualitas.</p>
+                </div>
+                <div class="card">
+                    <h3><i class="fa-solid fa-file-export"></i> Ekstraksi Format</h3>
+                    <p style="font-size: 18px;">Mengubah kumpulan foto (JPG) menjadi PDF, atau mengubah tata letak PDF menjadi format Microsoft Word.</p>
+                </div>
+                <div class="card" style="background: rgba(16, 185, 129, 0.1); border-color: var(--primary);">
+                    <h3><i class="fa-solid fa-magnifying-glass-chart"></i> AI Format Analyzer</h3>
+                    <p style="font-size: 18px;">Asisten pintar yang memvalidasi margin, spasi, dan font pada makalah berdasarkan pedoman UIR secara instan.</p>
+                </div>
             </div>
         </div>
 
         <div class="slide">
-            <div style="text-align: center; max-width: 800px; margin: 0 auto;">
-                <i class="fa-solid fa-rocket" style="font-size: 5rem; color: var(--accent); margin-bottom: 30px;"></i>
-                <h2>Status Implementasi & Kesimpulan</h2>
-                <p style="font-size: 1.5rem; color: #fff;">Nexus Hub telah sukses di-deploy dan berjalan dengan baik.</p>
-                <div style="background: var(--bg-card); padding: 30px; border-radius: 20px; margin-top: 40px; text-align: left;">
-                    <p><i class="fa-solid fa-check-circle text-accent"></i> <b>Implementasi Frontend:</b> Live at Vercel.</p>
-                    <p><i class="fa-solid fa-check-circle text-accent"></i> <b>Implementasi Backend:</b> Live at PythonAnywhere.</p>
-                    <p><i class="fa-solid fa-check-circle text-accent"></i> <b>Pengujian:</b> Seluruh *core-features* telah lulus pengujian *Black-box* dan *Validation Testing*.</p>
+            <h2 class="title">Entity Relationship Diagram (ERD)</h2>
+            <div class="content">
+                <p style="text-align: center; margin-bottom: 10px;">Skema basis data Supabase (PostgreSQL) dirancang khusus untuk memastikan <strong>Data Isolation</strong>.</p>
+                
+                <div class="erd-container">
+                    <div class="erd-line">
+                        <div class="erd-label">Melakukan</div>
+                        <div class="erd-cardinality-1">1</div>
+                        <div class="erd-cardinality-n">N</div>
+                    </div>
+
+                    <div class="erd-table">
+                        <div class="erd-header">USERS (Supabase Auth)</div>
+                        <div class="erd-row"><span class="key">id (PK)</span> <span>UUID</span></div>
+                        <div class="erd-row"><span>email</span> <span>VARCHAR</span></div>
+                        <div class="erd-row"><span>encrypted_password</span> <span>VARCHAR</span></div>
+                        <div class="erd-row"><span>created_at</span> <span>TIMESTAMP</span></div>
+                    </div>
+
+                    <div class="erd-table">
+                        <div class="erd-header">ACTIVITY_LOGS</div>
+                        <div class="erd-row"><span class="key">id (PK)</span> <span>UUID</span></div>
+                        <div class="erd-row"><span class="key">user_id (FK)</span> <span>UUID</span></div>
+                        <div class="erd-row"><span>tool_type</span> <span>VARCHAR</span></div>
+                        <div class="erd-row"><span>input_files</span> <span>JSONB</span></div>
+                        <div class="erd-row"><span>output_file_url</span> <span>TEXT</span></div>
+                        <div class="erd-row"><span>status</span> <span>VARCHAR</span></div>
+                        <div class="erd-row"><span>created_at</span> <span>TIMESTAMP</span></div>
+                    </div>
                 </div>
-                <h3 style="margin-top: 40px;">Terima Kasih!</h3>
             </div>
+        </div>
+
+        <div class="slide">
+            <h2 class="title">Validator Pedoman UIR (6 Parameter)</h2>
+            <div class="content">
+                <p style="text-align: center; margin-bottom: 30px;">AI membaca koordinat spasial (X/Y) teks dalam dokumen untuk memverifikasi aturan baku ini:</p>
+                <div class="param-grid">
+                    <div class="param-item"><strong>1. Margin Kertas (Sembir):</strong> Validasi presisi Kiri 4cm, Kanan/Atas/Bawah 3cm.</div>
+                    <div class="param-item"><strong>2. Spasi Baris:</strong> Pengecekan jarak antar teks 2 Spasi (Kecuali Abstrak 1 Spasi).</div>
+                    <div class="param-item"><strong>3. Font & Ukuran:</strong> Wajib <i>Times New Roman</i> & 12pt (Judul 14pt).</div>
+                    <div class="param-item"><strong>4. Batas Abstrak:</strong> Menghitung kata agar tidak melebihi 500 kata.</div>
+                    <div class="param-item"><strong>5. Daftar Isi:</strong> Memastikan daftar isi otomatis (bukan ketikan manual).</div>
+                    <div class="param-item"><strong>6. Penomoran Halaman:</strong> Transisi Romawi (i, ii) ke angka Arab (1, 2).</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2 class="title">Logika "Visual Highlighting"</h2>
+            <div class="content grid-2">
+                <div>
+                    <h3 style="margin-bottom: 20px; color: #fff; font-size: 28px;">Cara AI Menemukan Kesalahan:</h3>
+                    <ul>
+                        <li><i class="fa-solid fa-arrow-right"></i> <div><strong>Koordinat X/Y:</strong> Python membedah PDF bukan sebagai gambar, melainkan membaca titik koordinat letak tiap huruf (*Bounding Box*).</div></li>
+                        <li><i class="fa-solid fa-arrow-right"></i> <div><strong>Kalkulasi Jarak:</strong> Menghitung jarak Y antar baris (untuk mencari spasi) dan batas sumbu X (untuk mengecek margin 4cm).</div></li>
+                        <li><i class="fa-solid fa-arrow-right"></i> <div><strong>Draw Rect:</strong> Python menggambar kotak warna (merah/oranye) langsung di atas dokumen untuk memvisualisasikan kesalahan.</div></li>
+                    </ul>
+                </div>
+                <img src="./img/kodingan.png" alt="" class="img-box">
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2 class="title">Antarmuka & Output (Showcase)</h2>
+            <div class="content grid-2">
+                <img src="./img/hasil.png" class="img-box" style="height: 480px;">
+                </img>
+                <div style="display: flex; flex-direction: column; justify-content: center;">
+                    <h3 style="margin-bottom: 30px; color: #fff; font-size: 28px;">Keterangan Visual (UI):</h3>
+                    
+                    <div class="card" style="margin-bottom: 25px; border-left: 6px solid var(--red-alert);">
+                        <h3 style="color: var(--red-alert); font-size: 24px; margin-bottom: 10px;">Kotak Merah (Red Box)</h3>
+                        <p style="font-size: 18px; margin:0; color: #cbd5e1;">Digambar pada teks yang <b>menabrak batas Margin Kiri 4cm</b> atau Font/Ukuran salah.</p>
+                    </div>
+
+                    <div class="card" style="border-left: 6px solid var(--orange-alert);">
+                        <h3 style="color: var(--orange-alert); font-size: 24px; margin-bottom: 10px;">Kotak Oranye (Orange Box)</h3>
+                        <p style="font-size: 18px; margin:0; color: #cbd5e1;">Digambar pada paragraf yang terdeteksi spasinya terlalu rapat <b>(Menyimpang dari 2 Spasi)</b>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h2 class="title">Arsitektur Microservices</h2>
+            <div class="content grid-2">
+                <div>
+                    <h3 style="margin-bottom: 25px; color: var(--primary); font-size: 28px;">Pemisahan Beban (Decoupling)</h3>
+                    <ul>
+                        <li><i class="fa-brands fa-react" style="color: #61dafb; font-size:28px;"></i> <div><strong>Frontend (Next.js):</strong> Mengelola Antarmuka UI (Client-Side) dan otentikasi login dengan mulus.</div></li>
+                        <li><i class="fa-brands fa-python" style="color: #ffde57; font-size:28px;"></i> <div><strong>Backend (Python):</strong> Mesin komputasi <i>PyMuPDF</i> menanggung beban berat proses file secara rahasia.</div></li>
+                    </ul>
+                </div>
+                <div class="card" style="background: rgba(0,0,0,0.4);">
+                    <h3 style="margin-bottom: 25px; color: #fff; font-size: 28px;">Keamanan Data</h3>
+                    <ul>
+                        <li><i class="fa-solid fa-user-shield" style="color: var(--primary);"></i> <div><strong>Data Isolation (Supabase RLS):</strong> Pengguna tidak akan pernah bisa mengakses riwayat atau file milik pengguna lain.</div></li>
+                        <li><i class="fa-solid fa-trash-can" style="color: var(--primary);"></i> <div><strong>Garbage Collection:</strong> Sistem Python membuang file temporer dari RAM seketika setelah proses (Zero Data Retention).</div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide">
+            <div style="text-align: center; width: 100%;">
+                <h1 style="font-size: 80px; margin-bottom: 20px; color: var(--primary);">Terima Kasih</h1>
+                <p style="font-size: 24px; max-width: 900px; margin: 0 auto 50px;">Nexus Hub membuktikan bahwa pemrosesan dokumen kompleks dapat dilakukan dengan efisien, aman, dan cerdas melalui rekayasa perangkat lunak modern.</p>
+                <div style="padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.2); display: inline-block;">
+                    <p style="color: #fff; font-weight: 600; font-size: 20px; margin: 0;">Sesi Diskusi & Tanya Jawab</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-controls">
+            <button class="nav-btn" onclick="prevSlide()"><i class="fa-solid fa-chevron-left"></i></button>
+            <div class="slide-number"><span id="currSlide">1</span> / <span id="totalSlide">10</span></div>
+            <button class="nav-btn" onclick="nextSlide()"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
 
     </div>
@@ -381,47 +345,29 @@
     <script>
         let currentSlide = 0;
         const slides = document.querySelectorAll('.slide');
-        const counter = document.getElementById('slide-counter');
-
+        const currSlideEl = document.getElementById('currSlide');
+        document.getElementById('totalSlide').innerText = slides.length;
+        
         function updateSlides() {
             slides.forEach((slide, index) => {
-                slide.classList.remove('active', 'previous', 'next');
-                if (index === currentSlide) {
-                    slide.classList.add('active');
-                } else if (index < currentSlide) {
-                    slide.classList.add('previous');
-                } else {
-                    slide.classList.add('next');
-                }
+                slide.classList.remove('active');
+                if (index === currentSlide) slide.classList.add('active');
             });
-            counter.innerText = `Slide ${currentSlide + 1} / ${slides.length}`;
+            currSlideEl.innerText = currentSlide + 1;
         }
 
         function nextSlide() {
-            if (currentSlide < slides.length - 1) {
-                currentSlide++;
-                updateSlides();
-            }
+            if (currentSlide < slides.length - 1) { currentSlide++; updateSlides(); }
         }
 
         function prevSlide() {
-            if (currentSlide > 0) {
-                currentSlide--;
-                updateSlides();
-            }
+            if (currentSlide > 0) { currentSlide--; updateSlides(); }
         }
 
-        // Keyboard Navigation
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' || e.key === 'Space') {
-                nextSlide();
-            } else if (e.key === 'ArrowLeft') {
-                prevSlide();
-            }
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            else if (e.key === 'ArrowLeft') prevSlide();
         });
-
-        // Initialize
-        updateSlides();
     </script>
 </body>
 </html>
