@@ -10,9 +10,14 @@ export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  
+  // State Loading dipisah agar tombol yang berputar (spin) tidak bersamaan
   const [isLoading, setIsLoading] = useState(false);
+  const [isDemoLoading, setIsDemoLoading] = useState(false); 
+  
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // --- 1. FUNGSI LOGIN / REGISTER REGULER ---
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -22,20 +27,40 @@ export default function LoginPage() {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        router.push('/dashboard'); // Mengarah ke Dashboard yang baru
+        router.push('/dashboard');
       } else {
         const { error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
-        // Langsung login setelah daftar
         await supabase.auth.signInWithPassword({ email, password });
-        router.push('/dashboard'); // Mengarah ke Dashboard yang baru
+        router.push('/dashboard');
       }
     } catch (error: unknown) {
-      // PERBAIKAN: Mengganti tipe 'any' menjadi 'unknown' sesuai standar TypeScript
       const errMsg = error instanceof Error ? error.message : 'Terjadi kesalahan sistem.';
       setErrorMsg(errMsg);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // --- 2. FUNGSI LOGIN DEMO / GUEST ---
+  const handleDemoLogin = async () => {
+    setIsDemoLoading(true);
+    setErrorMsg(null);
+
+    try {
+      // PERHATIAN: Masukkan email dan password akun demo Anda di bawah ini
+      const { error } = await supabase.auth.signInWithPassword({
+        email: 'demo@nexushub.com', 
+        password: 'demo123', 
+      });
+      
+      if (error) throw error;
+      router.push('/dashboard');
+    } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : 'Gagal masuk ke akun Demo.';
+      setErrorMsg(errMsg);
+    } finally {
+      setIsDemoLoading(false);
     }
   };
 
@@ -87,12 +112,31 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            disabled={isLoading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition-colors shadow-md flex items-center justify-center"
+            disabled={isLoading || isDemoLoading}
+            className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-70 text-white font-bold py-3.5 rounded-xl transition-colors shadow-md flex items-center justify-center"
           >
-            {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : (isLogin ? 'Masuk ke Sistem' : 'Daftar Sekarang')}
+            {isLoading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+            {isLoading ? 'Memproses...' : (isLogin ? 'Masuk ke Sistem' : 'Daftar Sekarang')}
           </button>
         </form>
+
+        {/* --- GARIS PEMISAH (SEPARATOR) --- */}
+        <div className="relative flex items-center justify-center w-full my-6 border-t border-slate-200 dark:border-slate-700">
+          <span className="absolute px-4 text-xs font-semibold text-slate-400 bg-white dark:bg-slate-800 uppercase tracking-wider">
+            Atau
+          </span>
+        </div>
+
+        {/* --- TOMBOL DEMO LOGIN --- */}
+        <button
+          type="button"
+          onClick={handleDemoLogin}
+          disabled={isLoading || isDemoLoading}
+          className="w-full bg-emerald-100 dark:bg-emerald-900/30 hover:bg-emerald-200 dark:hover:bg-emerald-800/50 text-emerald-800 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-700/50 font-bold py-3.5 rounded-xl transition-colors shadow-sm flex items-center justify-center"
+        >
+          {isDemoLoading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : null}
+          {isDemoLoading ? 'Menghubungkan...' : 'Masuk sebagai Guest (Demo)'}
+        </button>
 
         <div className="mt-8 text-center">
           <button
